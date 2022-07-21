@@ -21,8 +21,7 @@ void *reader(reader_params_t *params) {
 	while (*params->is_running) {
 		memset(buf, 0, 2048);
 		rewind(fp);
-		int count = fread(buf, 1, 2047, fp);
-		printf("read: %d", count);
+		fread(buf, 1, 2047, fp);
 
 		if (cpu_count == 0) {
 			// get cpu count
