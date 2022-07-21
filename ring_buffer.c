@@ -47,3 +47,15 @@ void write_packet(ring_buffer_t *buffer, void *packet) {
 	sem_post(&buffer->packet_count);
 }
 
+void* read_packet(ring_buffer_t *buffer) {
+	sem_wait(&buffer->packet_count);
+
+	void *packet = buffer->packets[buffer->next_read];
+	buffer->packets[buffer->next_read++] = NULL;
+	buffer->next_read = wrap(buffer->next_read, buffer->size);
+
+	sem_post(&buffer->free_position_count);
+
+	return packet;
+}
+
