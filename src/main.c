@@ -1,3 +1,8 @@
+#include <assert.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
 #include "ring_buffer.h"
 
 // reads raw data from /proc/stat and sends it to analyzer via curcular buffer
@@ -19,4 +24,5 @@ void *sigterm_handler(int signum);
 
 int main() {
 
+	return 0;
 }
