@@ -23,3 +23,17 @@ int create(ring_buffer_t *buffer, int size) {
 	// this can fail if size > SEM_VALUE_MAX
 	return sem_init(&buffer->free_position_count, 0, size);
 }
+
+void destroy(ring_buffer_t *buffer) {
+	for (int i = buffer->next_read;; ++i) {
+		int index = wrap(i, buffer->size);
+		if (index == buffer->next_write) {
+			break;
+		}
+		free(buffer->packets[index]);
+	}
+	free(buffer->packets);
+
+	sem_destroy(&buffer->packet_count);
+	sem_destroy(&buffer->free_position_count);
+}
