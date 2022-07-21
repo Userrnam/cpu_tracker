@@ -8,7 +8,7 @@ static int wrap(int index, int size) {
 }
 
 int create(ring_buffer_t *buffer, int size) {
-	buffer->packets = (void *)calloc(size, sizeof(void *));
+	buffer->packets = (void *)calloc((size_t)size, sizeof(void *));
 	if (!buffer->packets) {
 		return -1;
 	}
@@ -21,7 +21,7 @@ int create(ring_buffer_t *buffer, int size) {
 	sem_init(&buffer->packet_count, 0, 0);
 
 	// this can fail if size > SEM_VALUE_MAX
-	return sem_init(&buffer->free_position_count, 0, size);
+	return sem_init(&buffer->free_position_count, 0, (unsigned)size);
 }
 
 void destroy(ring_buffer_t *buffer) {

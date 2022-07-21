@@ -48,7 +48,7 @@ void *analyzer_thread(void* _params) {
 							  (prev->elems[i].idle + prev->elems[i].non_idle);
 			int idle_delta  = cur->elems[i].idle - prev->elems[i].idle;
 
-			cpu_usage->elems[i] = (total_delta - idle_delta) / ((float)total_delta);
+			cpu_usage->elems[i] = (float)(total_delta - idle_delta) / (float)total_delta;
 		}
 		write_packet(analyzer_printer_buffer, cpu_usage);
 	}
