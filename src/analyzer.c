@@ -8,7 +8,7 @@ typedef struct cpu_times {
 	int non_idle;
 } cpu_times_t;
 
-void calc_cpu_times(cpu_stat_t *stat, cpu_times_t *times) {
+static void calc_cpu_times(cpu_stat_t *stat, cpu_times_t *times) {
 	times->idle     = stat->idle + stat->iowait;
 	times->non_idle = stat->user + stat->system + stat->irq + stat->softirq + stat->steal;
 }
