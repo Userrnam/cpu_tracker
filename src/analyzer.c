@@ -16,16 +16,14 @@ static void calc_cpu_times(cpu_stat_t *stat, cpu_times_t *times) {
 ARRAY(cpu_times)
 ARRAY_BASIC_TYPE(float)
 
-void *analyzer_thread(void* _params) {
-	analyzer_params_t *params = _params;
-
+void *analyzer_thread(analyzer_params_t* params) {
 	ring_buffer_t *reader_analyzer_buffer  = params->reader_analyzer_buffer;
 	ring_buffer_t *analyzer_printer_buffer = params->analyzer_printer_buffer;
 
 	cpu_times_array_t *prev = NULL;
 	cpu_times_array_t *cur  = NULL;
 
-	while (1) {
+	while (*params->is_running) {
 		cpu_stat_array_t *cpu_stat_array = read_packet(reader_analyzer_buffer);
 
 		// if it's first packet, create cpu_times arrays and continue.
@@ -55,5 +53,7 @@ void *analyzer_thread(void* _params) {
 
 	free(prev);
 	free(cur);
+
+	return NULL;
 }
 
