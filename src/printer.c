@@ -6,7 +6,7 @@
 
 ARRAY_BASIC_TYPE(float)
 
-void *printer_thread(printer_params_t *params) {
+void *printer(printer_params_t *params) {
 	ring_buffer_t *analyzer_printer_buffer = params->analyzer_printer_buffer;
 
 	while (*params->is_running) {

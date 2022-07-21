@@ -8,6 +8,6 @@ typedef struct reader_params {
     int *is_running;
 } reader_params_t;
 
-void *reader_thread(reader_params_t *params);
+void *reader(reader_params_t *params);
 
 #endif // READER_H

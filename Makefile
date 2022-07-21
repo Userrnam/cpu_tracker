@@ -1,5 +1,5 @@
-CC = gcc
-CFLAGS = -g -Wall -Wextra -I src
+CC = clang
+CFLAGS = -g -Weverything -std=c99 -I src
 LDFLAGS = -lpthread
 
 TARGET_EXEC := cpu_tracker
@@ -8,6 +8,7 @@ BUILD_DIR   := ./build
 
 SRCS := $(shell find src/ -name '*.c')
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
+HEADERS := $(shell find src/ -name '*.c')
 
 SRCS_NO_MAIN := $(foreach S,$(SRCS),$(if $(findstring main.c,$(S)),,$(S)))
 OBJS_NO_MAIN := $(SRCS_NO_MAIN:%=$(BUILD_DIR)/%.o)

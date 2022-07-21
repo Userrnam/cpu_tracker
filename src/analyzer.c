@@ -16,7 +16,7 @@ static void calc_cpu_times(cpu_stat_t *stat, cpu_times_t *times) {
 ARRAY(cpu_times)
 ARRAY_BASIC_TYPE(float)
 
-void *analyzer_thread(analyzer_params_t* params) {
+void *analyzer(analyzer_params_t* params) {
 	ring_buffer_t *reader_analyzer_buffer  = params->reader_analyzer_buffer;
 	ring_buffer_t *analyzer_printer_buffer = params->analyzer_printer_buffer;
 

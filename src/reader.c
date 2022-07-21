@@ -8,7 +8,7 @@
 #include "cpu_stat.h"
 
 
-void *reader_thread(reader_params_t *params) {
+void *reader(reader_params_t *params) {
 	int fd = open("/proc/stat", O_RDONLY);
 
 	ring_buffer_t *reader_analyzer_buffer = params->reader_analyzer_buffer;
