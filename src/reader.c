@@ -9,7 +9,7 @@
 
 
 void *reader(reader_params_t *params) {
-	int fd = open("/proc/stat", O_RDONLY);
+	FILE *fp = fopen("/proc/stat", "r");
 
 	ring_buffer_t *reader_analyzer_buffer = params->reader_analyzer_buffer;
 
@@ -20,12 +20,15 @@ void *reader(reader_params_t *params) {
 	int cpu_count = 0;
 	while (*params->is_running) {
 		memset(buf, 0, 2048);
-		read(fd, buf, 2047);
+		rewind(fp);
+		int count = fread(buf, 1, 2047, fp);
+		printf("read: %d", count);
 
 		if (cpu_count == 0) {
 			// get cpu count
+			char *p = buf;
 			while (1) {
-				char *p = strchr(buf, '\n')+1;
+				p = strchr(p, '\n')+1;
 				if (memcmp(p, "cpu", 3) == 0) {
 					cpu_count++;
 				} else {
@@ -34,8 +37,9 @@ void *reader(reader_params_t *params) {
 			}
 		}
 		cpu_stat_array_t *packet = alloc_cpu_stat_array(cpu_count);
+		char *p = buf;
 		for (int i = 0; i < cpu_count; ++i) {
-			char *p = strchr(buf, '\n')+1;
+			p = strchr(p, '\n')+1;
 			sscanf(p, "%*s %d %d %d %d %d %d %d %d %d %d",
 					&packet->elems[i].user,
 					&packet->elems[i].nice,
@@ -48,10 +52,11 @@ void *reader(reader_params_t *params) {
 					&packet->elems[i].guest,
 					&packet->elems[i].guest_nices);
 		}
+
 		write_packet(reader_analyzer_buffer, packet);
 	}
 
-	close(fd);
+	fclose(fp);
 
 	return NULL;
 }
