@@ -37,3 +37,13 @@ void destroy(ring_buffer_t *buffer) {
 	sem_destroy(&buffer->packet_count);
 	sem_destroy(&buffer->free_position_count);
 }
+
+void write_packet(ring_buffer_t *buffer, void *packet) {
+	sem_wait(&buffer->free_position_count);
+
+	buffer->packets[buffer->next_write++] = packet;
+	buffer->next_write = wrap(buffer->next_write, buffer->size);
+
+	sem_post(&buffer->packet_count);
+}
+
