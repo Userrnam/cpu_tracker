@@ -13,7 +13,7 @@ typedef struct type##_array { \
 	type##_t elems[]; \
 } type##_array_t; \
 static inline type##_array_t *alloc_##type##_array(int count) { \
-	type##_array_t *res = malloc(sizeof(int) + (size_t)count * sizeof(cpu_stat_t)); \
+	type##_array_t *res = malloc(sizeof(int) + (size_t)count * sizeof(type##_t)); \
 	res->count = count; \
 	return res; \
 }
@@ -25,7 +25,7 @@ typedef struct type##_array { \
 	type elems[]; \
 } type##_array_t; \
 static inline type##_array_t *alloc_##type##_array(int count) { \
-	type##_array_t *res = malloc(sizeof(int) + (size_t)count * sizeof(cpu_stat_t)); \
+	type##_array_t *res = malloc(sizeof(int) + (size_t)count * sizeof(type)); \
 	res->count = count; \
 	return res; \
 }
