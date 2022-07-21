@@ -1,21 +1,4 @@
-
-
-// used to send data from one thread to another. Works with packets
-typedef struct circular_buffer {
-	void **packets;
-	int start;		  // current position of the first packet in circular buffer.
-	int current_size; // how many packets buffer currently stores
-	int buffer_size;  // how many packets buffer can store
-	// FIXME: need some sync primitives
-} circular_buffer_t;
-
-// writes packet to circular buffer, if current_size > buffer_size overwrites the first packet
-// in buffer and moves start.
-void  write_packet(circular_buffer_t *circular_buffer, void *packet);
-
-// reads packet from circular buffer, returns NULL if buffer has no packets
-void* read_packet(circular_buffer_t *circular_buffer);
-
+#include "ring_buffer.h"
 
 // reads raw data from /proc/stat and sends it to analyzer via curcular buffer
 void *reader_thread(void*);
