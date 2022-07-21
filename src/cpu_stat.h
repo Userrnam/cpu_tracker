@@ -16,7 +16,7 @@ typedef struct cpu_stat {
 	int guest_nices;
 } cpu_stat_t;
 
-ARRAY(cpu_stat);
+ARRAY(cpu_stat)
 
 
 #endif // CPU_STAT_H

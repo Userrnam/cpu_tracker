@@ -13,8 +13,8 @@ void calc_cpu_times(cpu_stat_t *stat, cpu_times_t *times) {
 	times->non_idle = stat->user + stat->system + stat->irq + stat->softirq + stat->steal;
 }
 
-ARRAY(cpu_times);
-ARRAY_BASIC_TYPE(float);
+ARRAY(cpu_times)
+ARRAY_BASIC_TYPE(float)
 
 void *analyzer_thread(void* _params) {
 	analyzer_params_t *params = _params;
