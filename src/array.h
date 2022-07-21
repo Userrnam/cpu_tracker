@@ -1,6 +1,8 @@
 #ifndef ARRAY_H
 #define ARRAY_H
 
+#include <stdlib.h>
+
 // C version of a template. Since arrays in this application are used as packets you
 // can only use it by pointer, it was done this way to decrease number of allocations.
 // This macro is used for complex types (end with _t), the parameter to this macro is
