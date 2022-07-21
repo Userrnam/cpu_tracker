@@ -3,18 +3,20 @@
 
 #include <semaphore.h>
 
-// used to send data packet from one thread to another
+// used to send data packet from one thread to another. Packet is a void *, so it can point
+// to any data structure, when reading the packet the user must cast it to appropriate type.
 typedef struct ring_buffer {
 	void **packets;
 	int size;        // size of the buffer
 	int next_read;   // next packet is read at this index
 	int next_write;  // next packet is written at this index
 
-	sem_t read_block;   // block read when the buffer is empty
-	sem_t write_block;  // block write when the buffer is full
+	sem_t packet_count;        // number of packets in the buffer
+	sem_t free_position_count; // number of free positions in the buffer (size - packet_count)
 } ring_buffer_t;
 
-void create(ring_buffer_t *ring_buffer, int size);
+// returns 0 on success, -1 on error
+int create(ring_buffer_t *ring_buffer, int size);
 void destroy(ring_buffer_t *ring_buffer);
 
 // writes packet to the buffer, blocks if current_size > buffer_size
