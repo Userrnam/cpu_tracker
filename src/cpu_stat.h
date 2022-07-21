@@ -1,6 +1,8 @@
 #ifndef CPU_STAT_H
 #define CPU_STAT_H
 
+#include "array.h"
+
 typedef struct cpu_stat {
 	int user;
 	int nice;
