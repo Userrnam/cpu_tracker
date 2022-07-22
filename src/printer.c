@@ -2,6 +2,7 @@
 
 #include <time.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "array.h"
 
@@ -15,6 +16,10 @@ void *printer(printer_params_t *params) {
 	time_t prev_time = time(NULL);
 	while (*params->is_running) {
 		float_array_t *cpu_usage = read_packet(analyzer_printer_buffer);
+		// timeout
+		if (!cpu_usage) {
+			continue;
+		}
 		if (!total) {
 			total = alloc_float_array(cpu_usage->count);
 			memset(total->elems, 0, sizeof(float) * (size_t)total->count);
@@ -41,6 +46,8 @@ void *printer(printer_params_t *params) {
 
 		free(cpu_usage);
 	}
+
+	free(total);
 
 	return NULL;
 }

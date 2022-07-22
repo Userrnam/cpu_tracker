@@ -25,7 +25,10 @@ void *analyzer(analyzer_params_t* params) {
 
 	while (*params->is_running) {
 		cpu_stat_array_t *cpu_stat_array = read_packet(reader_analyzer_buffer);
-
+		// timeout
+		if (!cpu_stat_array) {
+			continue;
+		}
 		// if it's first packet, create cpu_times arrays and continue.
 		if (!prev) {
 			prev = alloc_cpu_times_array(cpu_stat_array->count);
@@ -33,6 +36,7 @@ void *analyzer(analyzer_params_t* params) {
 			for (int i = 0; i < prev->count; ++i) {
 				calc_cpu_times(&cpu_stat_array->elems[i], &prev->elems[i]);
 			}
+			free(cpu_stat_array);
 			continue;
 		}
 		for (int i = 0; i < prev->count; ++i) {

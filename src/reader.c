@@ -56,9 +56,6 @@ void *reader(reader_params_t *params) {
 
 		write_packet(reader_analyzer_buffer, packet);
 
-		// declare usleep. Yes, it's ugly but, otherwise you get a warning
-		int usleep(int microseconds);
-
 		// sleep for 1ms otherwise our cpu tracker will use 100% of CPU!
 		usleep(1000);
 	}
