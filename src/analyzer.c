@@ -41,14 +41,21 @@ void *analyzer(analyzer_params_t* params) {
 		free(cpu_stat_array);
 
 		float_array_t *cpu_usage = alloc_float_array(cur->count);
+		int same = 0;
 		for (int i = 0; i < cur->count; ++i) {
 			int total_delta = (cur->elems[i].idle + cur->elems[i].non_idle) -
 							  (prev->elems[i].idle + prev->elems[i].non_idle);
+			if (total_delta == 0) {
+				same = 1;
+				break;
+			}
 			int idle_delta  = cur->elems[i].idle - prev->elems[i].idle;
 
 			cpu_usage->elems[i] = (float)(total_delta - idle_delta) / (float)total_delta;
 		}
-		write_packet(analyzer_printer_buffer, cpu_usage);
+		if (!same) {
+			write_packet(analyzer_printer_buffer, cpu_usage);
+		}
 	}
 
 	free(prev);
