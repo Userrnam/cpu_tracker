@@ -5,7 +5,7 @@
 
 typedef struct printer_params {
 	ring_buffer_t *analyzer_printer_buffer;
-	int *is_running;
+	volatile int *is_running;
 } printer_params_t;
 
 // reads raw data from /proc/stat and sends it to analyzer via curcular buffer
