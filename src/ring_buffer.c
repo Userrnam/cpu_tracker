@@ -1,7 +1,8 @@
 #include "ring_buffer.h"
 
 #include <stdlib.h>
-
+#include <time.h>
+#include <stdio.h>
 
 static int wrap(int index, int size) {
 	return index >= size ? index - size : index;
@@ -48,7 +49,16 @@ void write_packet(ring_buffer_t *buffer, void *packet) {
 }
 
 void* read_packet(ring_buffer_t *buffer) {
-	sem_wait(&buffer->packet_count);
+	struct timespec ts;
+	if (clock_gettime(CLOCK_REALTIME, &ts) == -1) {
+        perror("clock_gettime");
+        exit(EXIT_FAILURE);
+    }
+    ts.tv_sec += 1;
+
+	if (sem_timedwait(&buffer->packet_count, &ts) == -1) {
+		return NULL;
+	}
 
 	void *packet = buffer->packets[buffer->next_read];
 	buffer->packets[buffer->next_read++] = NULL;
