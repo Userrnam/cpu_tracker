@@ -7,21 +7,23 @@
 
 #include "cpu_stat.h"
 
+#define BUFFER_SIZE 2048
 
 void *reader(reader_params_t *params) {
 	FILE *fp = fopen("/proc/stat", "r");
 
 	ring_buffer_t *reader_analyzer_buffer = params->reader_analyzer_buffer;
 
-	// 2048 bytes should be enough
-	char buf[2048];
+	// contents of file /proc/stat is constantly updating, so we copy should copy it into a
+	// buffer before processing.
+	char buf[BUFFER_SIZE];
 
 	// 0 means uninitialized
 	int cpu_count = 0;
 	while (*params->is_running) {
-		memset(buf, 0, 2048);
+		memset(buf, 0, BUFFER_SIZE);
 		rewind(fp);
-		fread(buf, 1, 2047, fp);
+		fread(buf, 1, BUFFER_SIZE-1, fp);
 
 		if (cpu_count == 0) {
 			// get cpu count
@@ -53,6 +55,12 @@ void *reader(reader_params_t *params) {
 		}
 
 		write_packet(reader_analyzer_buffer, packet);
+
+		// declare usleep. Yes, it's ugly but, otherwise you get a warning
+		int usleep(int microseconds);
+
+		// sleep for 1ms otherwise our cpu tracker will use 100% of CPU!
+		usleep(1000);
 	}
 
 	fclose(fp);
