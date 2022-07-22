@@ -3,6 +3,7 @@
 #include "array.h"
 #include "cpu_stat.h"
 
+
 typedef struct cpu_times {
 	int idle;
 	int non_idle;
@@ -39,7 +40,7 @@ void *analyzer(analyzer_params_t* params) {
 			free(cpu_stat_array);
 			continue;
 		}
-		for (int i = 0; i < prev->count; ++i) {
+		for (int i = 0; i < cur->count; ++i) {
 			calc_cpu_times(&cpu_stat_array->elems[i], &cur->elems[i]);
 		}
 		free(cpu_stat_array);
@@ -59,6 +60,13 @@ void *analyzer(analyzer_params_t* params) {
 		}
 		if (!same) {
 			write_packet(analyzer_printer_buffer, cpu_usage);
+
+			// swap cur and prev
+			cpu_times_array_t *tmp = cur;
+			cur = prev;
+			prev = tmp;
+		} else {
+			free(cpu_usage);
 		}
 	}
 
