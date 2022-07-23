@@ -7,10 +7,10 @@
 
 #define BUFFER_SIZE 2048
 
-cpu_stat_array_t *parse_cpu_stats(char *s) {
+cpu_stat_array_t *parse_cpu_stats(const char *s) {
 	// get cpu count.
 	int core_count = 0;
-	char *p = s;
+	const char *p = s;
 	while (1) {
 		p = strchr(p, '\n')+1;
 		if (memcmp(p, "cpu", 3) == 0) {
@@ -40,7 +40,7 @@ cpu_stat_array_t *parse_cpu_stats(char *s) {
 	return cpu_stats;
 }
 
-void *reader(reader_params_t *params) {
+void *reader(const reader_params_t *params) {
 	FILE *fp = fopen("/proc/stat", "r");
 
 	ring_buffer_t *reader_analyzer_buffer = params->reader_analyzer_buffer;

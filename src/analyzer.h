@@ -10,6 +10,6 @@ typedef struct analyzer_params {
 } analyzer_params_t;
 
 // receives data from reader, calculates CPU usage for each CPU core and sends it to printer
-void *analyzer(analyzer_params_t*);
+void *analyzer(const analyzer_params_t*);
 
 #endif // ANALYZER_H

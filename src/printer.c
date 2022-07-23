@@ -8,12 +8,12 @@
 
 ARRAY_BASIC_TYPE(float)
 
-void *printer(printer_params_t *params) {
+void *printer(const printer_params_t *params) {
 	ring_buffer_t *analyzer_printer_buffer = params->analyzer_printer_buffer;
 
 	int count = 0;
 	float_array_t *total = NULL;
-	time_t prev_time = time(NULL);
+	time_t prev_time = 0;
 	while (*params->is_running) {
 		float_array_t *cpu_usage = read_packet(analyzer_printer_buffer);
 		// timeout
@@ -35,7 +35,7 @@ void *printer(printer_params_t *params) {
 			// print usage, beginning is the escape sequence to clear the screen
 			puts("\033[1;1H\033[2JCPU usage:");
 			for (int i = 0; i < total->count; ++i) {
-				printf("core %d: %f\n", i, (double)total->elems[i] / (double)count);
+				printf("core %d: %f %%\n", i, (double)total->elems[i] / (double)count * 100.0);
 			}
 
 			// reset 'per frame' values

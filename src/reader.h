@@ -10,7 +10,7 @@ typedef struct reader_params {
     volatile int *is_running;
 } reader_params_t;
 
-cpu_stat_array_t *parse_cpu_stats(char *s);
-void *reader(reader_params_t *params);
+cpu_stat_array_t *parse_cpu_stats(const char *s);
+void *reader(const reader_params_t *params);
 
 #endif // READER_H

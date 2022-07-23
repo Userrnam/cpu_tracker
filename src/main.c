@@ -71,7 +71,5 @@ int main() {
 	destroy(&reader_analyzer_buffer);
 	destroy(&analyzer_printer_buffer);
 
-	printf("%d\n", is_running);
-
 	return 0;
 }

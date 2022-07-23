@@ -10,6 +10,6 @@ typedef struct printer_params {
 
 // reads raw data from /proc/stat and sends it to analyzer via curcular buffer
 // receives data from analyzer and prints it to the console
-void *printer(printer_params_t*);
+void *printer(const printer_params_t*);
 
 #endif // PRINTER_H
