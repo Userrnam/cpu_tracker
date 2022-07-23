@@ -6,6 +6,7 @@
 
 #include <ring_buffer.h>
 #include <reader.h>
+#include <analyzer.h>
 
 
 void ring_buffer_test() {
@@ -74,11 +75,52 @@ void reader_test() {
 	free(expected);
 }
 
+void analyzer_test() {
+	cpu_stat_array_t *cpu_stats = alloc_cpu_stat_array(2);
+	cpu_stats->elems[0].user = 3527;
+	cpu_stats->elems[0].nice = 31;
+	cpu_stats->elems[0].system = 6287;
+	cpu_stats->elems[0].idle = 3073484;
+	cpu_stats->elems[0].iowait = 193;
+	cpu_stats->elems[0].irq = 2110;
+	cpu_stats->elems[0].softirq = 689;
+	cpu_stats->elems[0].steal = 0;
+	cpu_stats->elems[0].guest = 0;
+	cpu_stats->elems[0].guest_nices = 0;
+
+	cpu_stats->elems[1].user = 4311;
+	cpu_stats->elems[1].nice = 280;
+	cpu_stats->elems[1].system = 3726;
+	cpu_stats->elems[1].idle = 2979621;
+	cpu_stats->elems[1].iowait = 924;
+	cpu_stats->elems[1].irq = 31751;
+	cpu_stats->elems[1].softirq = 54388;
+	cpu_stats->elems[1].steal = 0;
+	cpu_stats->elems[1].guest = 0;
+	cpu_stats->elems[1].guest_nices = 0;
+
+	cpu_times_array_t *cpu_times = alloc_cpu_times_array(2);
+	calc_cpu_times(cpu_stats, cpu_times);
+
+	cpu_times_array_t *expected_cpu_times = alloc_cpu_times_array(2);
+	expected_cpu_times->elems[0].idle = 3073677;
+	expected_cpu_times->elems[0].non_idle = 12613;
+	expected_cpu_times->elems[1].idle = 2980545;
+	expected_cpu_times->elems[1].non_idle = 94176;
+
+	assert(memcmp(cpu_times->elems, expected_cpu_times->elems, 2 * sizeof(cpu_times_t)) == 0);
+
+	free(cpu_times);
+	free(expected_cpu_times);
+	free(cpu_stats);
+}
+
 int main() {
 	srand(time(NULL));
 
 	ring_buffer_test();
 	reader_test();
+	analyzer_test();
 
 	puts("OK");
 
