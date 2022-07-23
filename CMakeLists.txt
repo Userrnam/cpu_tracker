@@ -20,6 +20,7 @@ add_executable(${PROJECT_NAME}
 	src/ring_buffer.c
 	src/analyzer.c
 	src/logger.c
+	src/watchdog.c
 )
 
 # build tests
@@ -30,6 +31,7 @@ add_executable(tests
 	src/ring_buffer.c
 	src/analyzer.c
 	src/logger.c
+	src/watchdog.c
 )
 
 target_include_directories(tests PUBLIC src)
