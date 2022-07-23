@@ -1,21 +1,29 @@
 #include "analyzer.h"
 
-#include "array.h"
-#include "cpu_stat.h"
 
-
-typedef struct cpu_times {
-	int idle;
-	int non_idle;
-} cpu_times_t;
-
-static void calc_cpu_times(cpu_stat_t *stat, cpu_times_t *times) {
-	times->idle     = stat->idle + stat->iowait;
-	times->non_idle = stat->user + stat->system + stat->irq + stat->softirq + stat->steal;
+void calc_cpu_times(const cpu_stat_array_t *stats, cpu_times_array_t *times) {
+	for (int i = 0; i < stats->count; ++i) {
+		times->elems[i].idle     = stats->elems[i].idle + stats->elems[i].iowait;
+		times->elems[i].non_idle = stats->elems[i].user + stats->elems[i].system + stats->elems[i].irq
+							     + stats->elems[i].softirq + stats->elems[i].steal;
+	}
 }
 
-ARRAY(cpu_times)
-ARRAY_BASIC_TYPE(float)
+float_array_t *calc_cpu_usage(const cpu_times_array_t *prev, const cpu_times_array_t *cur) {
+	float_array_t *cpu_usage = alloc_float_array(cur->count);
+	for (int i = 0; i < cur->count; ++i) {
+		int total_delta = (cur->elems[i].idle + cur->elems[i].non_idle) -
+						  (prev->elems[i].idle + prev->elems[i].non_idle);
+		if (total_delta == 0) {
+			free(cpu_usage);
+			return NULL;
+		}
+		int idle_delta  = cur->elems[i].idle - prev->elems[i].idle;
+
+		cpu_usage->elems[i] = (float)(total_delta - idle_delta) / (float)total_delta;
+	}
+	return cpu_usage;
+}
 
 void *analyzer(const analyzer_params_t* params) {
 	ring_buffer_t *reader_analyzer_buffer  = params->reader_analyzer_buffer;
@@ -34,39 +42,22 @@ void *analyzer(const analyzer_params_t* params) {
 		if (!prev) {
 			prev = alloc_cpu_times_array(cpu_stat_array->count);
 			cur  = alloc_cpu_times_array(cpu_stat_array->count);
-			for (int i = 0; i < prev->count; ++i) {
-				calc_cpu_times(&cpu_stat_array->elems[i], &prev->elems[i]);
-			}
+			calc_cpu_times(cpu_stat_array, prev);
 			free(cpu_stat_array);
 			continue;
 		}
-		for (int i = 0; i < cur->count; ++i) {
-			calc_cpu_times(&cpu_stat_array->elems[i], &cur->elems[i]);
-		}
+
+		calc_cpu_times(cpu_stat_array, cur);
 		free(cpu_stat_array);
 
-		float_array_t *cpu_usage = alloc_float_array(cur->count);
-		int same = 0;
-		for (int i = 0; i < cur->count; ++i) {
-			int total_delta = (cur->elems[i].idle + cur->elems[i].non_idle) -
-							  (prev->elems[i].idle + prev->elems[i].non_idle);
-			if (total_delta == 0) {
-				same = 1;
-				break;
-			}
-			int idle_delta  = cur->elems[i].idle - prev->elems[i].idle;
-
-			cpu_usage->elems[i] = (float)(total_delta - idle_delta) / (float)total_delta;
-		}
-		if (!same) {
+		float_array_t *cpu_usage = calc_cpu_usage(prev, cur);
+		if (cpu_usage) {
 			write_packet(analyzer_printer_buffer, cpu_usage);
 
 			// swap cur and prev
 			cpu_times_array_t *tmp = cur;
 			cur = prev;
 			prev = tmp;
-		} else {
-			free(cpu_usage);
 		}
 	}
 
