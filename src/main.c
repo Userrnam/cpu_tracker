@@ -8,25 +8,27 @@
 #include "reader.h"
 #include "analyzer.h"
 #include "printer.h"
-
+#include "logger.h"
 
 // receives some message from all threads, if at least 1 thread hasn't sent a message in more
 // than 2s stops the application
 void *watchdog(void*);
-
-void *logger(void*);
 
 static volatile int is_running;
 
 static void signal_handler(int signum) {
 	// in our case this is useless, but otherwise you get a warning
 	if (signum == SIGINT) {
+		log_message(INFO, "got SIGINT, stopping application");
 		is_running = 0;
 	}
 }
 
 int main() {
 	is_running = 1;
+
+	// make sure the logger turns off last
+	int logger_is_running = 1;
 
 	// setup signale handler
 	struct sigaction action;
@@ -40,6 +42,19 @@ int main() {
 
 	create(&reader_analyzer_buffer, 100);
 	create(&analyzer_printer_buffer, 100);
+
+	// create logger thread
+	logger_params_t logger_params;
+	logger_params.file_name = "log.txt";
+	logger_params.ring_buffer_size = 100;
+	logger_params.types_bitmask = INFO | WARNING | ERROR;
+	logger_params.is_running = &logger_is_running;
+	if (sem_init(&logger_params.started, 0, 0) != 0) {
+		perror("sem_init");
+	}
+	pthread_t logger_thread;
+	pthread_create(&logger_thread, NULL, (void*(*)(void*))logger, &logger_params);
+	sem_wait(&logger_params.started);
 
 	// create reader thread
 	reader_params_t reader_params;
@@ -67,6 +82,11 @@ int main() {
 	pthread_join(reader_thread,   NULL);
 	pthread_join(analyzer_thread, NULL);
 	pthread_join(printer_thread,  NULL);
+
+	// stop logger
+	logger_is_running = 0;
+
+	pthread_join(logger_thread,   NULL);
 
 	destroy(&reader_analyzer_buffer);
 	destroy(&analyzer_printer_buffer);

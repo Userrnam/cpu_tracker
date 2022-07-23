@@ -5,10 +5,13 @@
 #include <string.h>
 
 #include "array.h"
+#include "logger.h"
 
 ARRAY_BASIC_TYPE(float)
 
 void *printer(const printer_params_t *params) {
+	log_message(INFO, "printer started");
+
 	ring_buffer_t *analyzer_printer_buffer = params->analyzer_printer_buffer;
 
 	int count = 0;
@@ -18,6 +21,7 @@ void *printer(const printer_params_t *params) {
 		float_array_t *cpu_usage = read_packet(analyzer_printer_buffer);
 		// timeout
 		if (!cpu_usage) {
+			log_message(WARNING, "printer timeout");
 			continue;
 		}
 		if (!total) {
@@ -48,6 +52,7 @@ void *printer(const printer_params_t *params) {
 	}
 
 	free(total);
+	log_message(INFO, "printer stopped");
 
 	return NULL;
 }

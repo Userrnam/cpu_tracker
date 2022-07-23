@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "logger.h"
+
 #define BUFFER_SIZE 2048
 
 cpu_stat_array_t *parse_cpu_stats(const char *s) {
@@ -41,6 +43,8 @@ cpu_stat_array_t *parse_cpu_stats(const char *s) {
 }
 
 void *reader(const reader_params_t *params) {
+	log_message(INFO, "reader started");
+
 	FILE *fp = fopen("/proc/stat", "r");
 
 	ring_buffer_t *reader_analyzer_buffer = params->reader_analyzer_buffer;
@@ -63,6 +67,8 @@ void *reader(const reader_params_t *params) {
 	}
 
 	fclose(fp);
+
+	log_message(INFO, "reader stopped");
 
 	return NULL;
 }
