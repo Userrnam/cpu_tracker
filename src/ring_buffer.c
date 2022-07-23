@@ -79,6 +79,7 @@ void* read_packet(ring_buffer_t *buffer) {
     ts.tv_sec += 1;
 
 	if (sem_timedwait(&buffer->packet_count, &ts) == -1) {
+		pthread_mutex_unlock(&buffer->read_mtx);
 		return NULL;
 	}
 
