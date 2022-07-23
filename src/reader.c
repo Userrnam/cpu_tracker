@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "logger.h"
+#include "watchdog.h"
 
 #define BUFFER_SIZE 2048
 
@@ -54,6 +55,7 @@ void *reader(const reader_params_t *params) {
 	char buf[BUFFER_SIZE];
 
 	while (*params->is_running) {
+		inform_watchdog(params->thread_id);
 		memset(buf, 0, BUFFER_SIZE);
 		rewind(fp);
 		fread(buf, 1, BUFFER_SIZE-1, fp);

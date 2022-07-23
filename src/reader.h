@@ -7,6 +7,7 @@
 
 typedef struct reader_params {
     ring_buffer_t *reader_analyzer_buffer;
+	int thread_id;
     volatile int *is_running;
 } reader_params_t;
 

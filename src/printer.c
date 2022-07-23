@@ -6,6 +6,7 @@
 
 #include "array.h"
 #include "logger.h"
+#include "watchdog.h"
 
 ARRAY_BASIC_TYPE(float)
 
@@ -18,6 +19,7 @@ void *printer(const printer_params_t *params) {
 	float_array_t *total = NULL;
 	time_t prev_time = 0;
 	while (*params->is_running) {
+		inform_watchdog(params->thread_id);
 		float_array_t *cpu_usage = read_packet(analyzer_printer_buffer);
 		// timeout
 		if (!cpu_usage) {

@@ -1,6 +1,7 @@
 #include "analyzer.h"
 
 #include "logger.h"
+#include "watchdog.h"
 
 void calc_cpu_times(const cpu_stat_array_t *stats, cpu_times_array_t *times) {
 	for (int i = 0; i < stats->count; ++i) {
@@ -36,6 +37,7 @@ void *analyzer(const analyzer_params_t* params) {
 	cpu_times_array_t *cur  = NULL;
 
 	while (*params->is_running) {
+		inform_watchdog(params->thread_id);
 		cpu_stat_array_t *cpu_stat_array = read_packet(reader_analyzer_buffer);
 		// timeout
 		if (!cpu_stat_array) {

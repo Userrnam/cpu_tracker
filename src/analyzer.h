@@ -8,6 +8,7 @@
 typedef struct analyzer_params {
 	ring_buffer_t *reader_analyzer_buffer;
 	ring_buffer_t *analyzer_printer_buffer;
+	int thread_id;
 	volatile int *is_running;
 } analyzer_params_t;
 

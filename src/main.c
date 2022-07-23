@@ -9,10 +9,7 @@
 #include "analyzer.h"
 #include "printer.h"
 #include "logger.h"
-
-// receives some message from all threads, if at least 1 thread hasn't sent a message in more
-// than 2s stops the application
-void *watchdog(void*);
+#include "watchdog.h"
 
 static volatile int is_running;
 
@@ -25,6 +22,8 @@ static void signal_handler(int signum) {
 }
 
 int main() {
+	const char *thread_names[] = { "reader", "analyzer", "printer" };
+
 	is_running = 1;
 
 	// make sure the logger turns off last
@@ -56,15 +55,29 @@ int main() {
 	pthread_create(&logger_thread, NULL, (void*(*)(void*))logger, &logger_params);
 	sem_wait(&logger_params.started);
 
+	// create watchdog thread
+	watchdog_params_t watchdog_params;
+	watchdog_params.names = thread_names;
+	watchdog_params.thread_count = 3;
+	watchdog_params.is_running = &is_running;
+	if (sem_init(&watchdog_params.started, 0, 0) != 0) {
+		perror("sem_init");
+	}
+	pthread_t watchdog_thread;
+	pthread_create(&watchdog_thread, NULL, (void*(*)(void*))watchdog, &watchdog_params);
+	sem_wait(&watchdog_params.started);
+
 	// create reader thread
 	reader_params_t reader_params;
 	reader_params.reader_analyzer_buffer = &reader_analyzer_buffer;
+	reader_params.thread_id = 0;
 	reader_params.is_running = &is_running;
 	pthread_t reader_thread;
 	pthread_create(&reader_thread, NULL, (void*(*)(void*))reader, &reader_params);
 
 	// create analyzer thread
 	analyzer_params_t analyzer_params;
+	analyzer_params.thread_id = 1;
 	analyzer_params.reader_analyzer_buffer = &reader_analyzer_buffer;
 	analyzer_params.analyzer_printer_buffer = &analyzer_printer_buffer ;
 	analyzer_params.is_running = &is_running;
@@ -73,6 +86,7 @@ int main() {
 
 	// create printer thread
 	printer_params_t printer_params;
+	printer_params.thread_id = 2;
 	printer_params.analyzer_printer_buffer = &analyzer_printer_buffer;
 	printer_params.is_running = &is_running;
 	pthread_t printer_thread;
@@ -82,6 +96,7 @@ int main() {
 	pthread_join(reader_thread,   NULL);
 	pthread_join(analyzer_thread, NULL);
 	pthread_join(printer_thread,  NULL);
+	pthread_join(watchdog_thread, NULL);
 
 	// stop logger
 	logger_is_running = 0;
