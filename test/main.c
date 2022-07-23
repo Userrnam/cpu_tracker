@@ -69,6 +69,9 @@ void reader_test() {
 	expected->elems[1].guest_nices = 0;
 
 	assert(memcmp(got->elems, expected->elems, 2 * sizeof(cpu_stat_t)) == 0);
+
+	free(got);
+	free(expected);
 }
 
 int main() {
