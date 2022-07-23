@@ -77,6 +77,7 @@ void *logger(logger_params_t *params) {
 	}
 
 	write_message(fp, INFO, "logger stopped");
+	fprintf(fp, "\n");
 
 	fclose(fp);
 
@@ -87,8 +88,6 @@ void *logger(logger_params_t *params) {
 
 void log_message(int type, const char *s) {
 	if (!initialized || (type & types_bitmask) == 0) {
-		printf("%d\n", initialized);
-		puts("FUK");
 		return;
 	}
 	message_t *msg = (message_t *)malloc(sizeof(message_t));
