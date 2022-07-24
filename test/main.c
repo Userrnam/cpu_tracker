@@ -9,7 +9,7 @@
 #include <analyzer.h>
 
 
-void ring_buffer_test() {
+static void ring_buffer_test() {
 	ring_buffer_t ring_buffer;
 
 	create(&ring_buffer, 100);
@@ -39,7 +39,7 @@ void ring_buffer_test() {
 	destroy(&ring_buffer);
 }
 
-void reader_test() {
+static void reader_test() {
 	const char *s = "cpu  7839 311 10013 6053105 1118 33862 55077 0 0 0\n"
 		"cpu0 3527 31 6287 3073484 193 2110 689 0 0 0\n"
 		"cpu1 4311 280 3726 2979621 924 31751 54388 0 0 0\n"
@@ -75,7 +75,7 @@ void reader_test() {
 	free(expected);
 }
 
-void analyzer_test() {
+static void analyzer_test() {
 	cpu_stat_array_t *cpu_stats = alloc_cpu_stat_array(2);
 	cpu_stats->elems[0].user = 3527;
 	cpu_stats->elems[0].nice = 31;
@@ -116,7 +116,7 @@ void analyzer_test() {
 }
 
 int main() {
-	srand(time(NULL));
+	srand((unsigned)time(NULL));
 
 	ring_buffer_test();
 	reader_test();

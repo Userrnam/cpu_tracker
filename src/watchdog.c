@@ -19,7 +19,7 @@ void *watchdog(watchdog_params_t *params) {
 
 	// initialize inform_time array to current time
 	for (int i = 0; i < inform_time->count; ++i) {
-		inform_time->elems[i] = time(NULL);
+		inform_time->elems[i] = (int)time(NULL);
 	}
 
 	sem_post(&params->started);
@@ -58,6 +58,6 @@ void inform_watchdog(int id) {
 		return;
 	}
 
-	inform_time->elems[id] = time(NULL);
+	inform_time->elems[id] = (int)time(NULL);
 }
 

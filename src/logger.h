@@ -3,9 +3,9 @@
 
 #include <semaphore.h>
 
-#define INFO    0b001
-#define WARNING 0b010
-#define ERROR   0b100
+#define INFO    1  // 0b001
+#define WARNING 2  // 0b010
+#define ERROR   4  // 0b100
 
 typedef struct logger_params {
 	const char *file_name;

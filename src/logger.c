@@ -17,7 +17,7 @@ static int types_bitmask;
 static int initialized;
 
 // writes message to file
-void write_message(FILE *fp, int type, const char *msg) {
+static void write_message(FILE *fp, int type, const char *msg) {
 	char time_buffer[64];
 
 	time_t raw_time = time(NULL);
